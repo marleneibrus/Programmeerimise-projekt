@@ -1,9 +1,12 @@
+# Tegelasele ja marjale peaks assignima class'id ja paika panema mänguvälja piirid, hetkel saab karu ekraanist välja minna
+# Koobas võiks ka ss class'iga olla, saab collisioniga määrata?
+
 # ==== IMPORTIMINE ====
 import pygame
 import random
 import time
 
-# ==== SETUP JA TAUST ====
+# ==== SETUP JA TAUSTA VÄRV ====
 pygame.init()
 
 (laius, suurus) = (0,0)
@@ -14,12 +17,14 @@ taustavärv = (50,90,10)
 
 
 # ==== TEGELANE ====
+# Meie karu nimi on Nefi
 nefi_pilt = pygame.image.load("Nefi_seisab.png").convert_alpha()
+nefi_pilt = pygame.transform.scale(nefi_pilt, (250, 200))
 
 def lisa_nefi_asukohal(x,y):
     ekraan.blit(nefi_pilt, (x,y))
 
-x = 300
+x = 500
 y = 300
 
 x_muutus = 0
@@ -54,5 +59,6 @@ while programm_käib:
 
     ekraan.fill(taustavärv)
     lisa_nefi_asukohal(x,y)
+
 
     pygame.display.update()
