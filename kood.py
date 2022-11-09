@@ -20,18 +20,19 @@ taustavärv = (50,90,10)
 
 # ==== TEGELANE ====
 # Meie karu nimi on Nefi
-nefi_pilt = pygame.image.load("Nefi_seisab.png").convert_alpha()
-nefi_pilt = pygame.transform.scale(nefi_pilt, (250, 200))
-rect = nefi_pilt.get_rect()
-print(rect)
-nefi_asukoht = pygame.Rect(0, 0, 250, 200)
+nefi_pilt = pygame.image.load("Nefi_seisab.xcf").convert_alpha()
+nefi_pilt = pygame.transform.scale(nefi_pilt, (80, 100))
+rect1 = nefi_pilt.get_rect()
+nefi_asukoht = pygame.Rect(0, 0, 80, 100)
 
-def lisa_nefi_asukohal(nefi_pilt,rect):
-    ekraan.blit(nefi_pilt, rect)
+mari_pilt = pygame.image.load('mari.xcf').convert_alpha()
+mari_pilt = pygame.transform.scale(mari_pilt, (35, 35))
+rect2 = mari_pilt.get_rect()
+mari_asukoht = pygame.Rect(0, 0, 35, 35)
 
-x = 500
-y = 300
 
+x = 0
+y = 0
 x_muutus = 0
 y_muutus = 0
 
@@ -110,10 +111,13 @@ while programm_käib:
                 y_muutus = 0
     
     ekraan.blit(nefi_pilt, nefi_asukoht)
+    ekraan.blit(mari_pilt, mari_asukoht)
     nefi_asukoht.move_ip(x_muutus, y_muutus)
     nefi_asukoht.clamp_ip(ekraan.get_rect())
-    ekraan.fill(taustavärv)
+
     pygame.display.flip()
+
+    ekraan.fill(taustavärv)
 # tekitab koopa kasti, prindib tehte, koht kuhu saab kirjutada
     pygame.draw.rect(ekraan,koopa_värv,koopa_asukoht,2)
     tekstipind = base_font.render(user_tekst, True, (255,255,255))
@@ -122,7 +126,6 @@ while programm_käib:
     avaldise_kuvamine = base_font.render(tehe, True, (255,255,255))
     ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x + 5, koopa_asukoht.y + 5))
 
-    pygame.display.flip()
+
 
 pygame.quit()
-    #pygame.display.update()
