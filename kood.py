@@ -34,13 +34,23 @@ y_muutus = 0
 # ==== KOOPA EHITAMISE JAOKS MÕELDUD ARVUTAMISMÄNG ====
 # funktsioon genereerib suvalise avaldise 
 def suvaline_avaldis():
-    esimene_arv = random.randint(0,10)
-    teine_arv = random.randint(1,10)
-    aritmeetilised_tehted = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
+    aritmeetilised_tehted = {"+": operator.add, "-": operator.sub, "*": operator.mul}
     aritmeetiline_tehe = random.choice(list(aritmeetilised_tehted.keys()))
+    
+    if aritmeetiline_tehe == "+":
+        esimene_arv = random.randint(0,100)
+        teine_arv = min (random.randint(0,100),100-esimene_arv)
+    elif aritmeetiline_tehe == "-":
+        teine_arv = random.randint(1,100)
+        esimene_arv = max(100- random.randint(0,100),teine_arv)
+        
+    elif aritmeetiline_tehe == "*":
+        esimene_arv = random.randint(1,10)
+        teine_arv = random.randint(0,10)    
+
     õige_vastus = aritmeetilised_tehted.get(aritmeetiline_tehe) (esimene_arv, teine_arv)
     küsimus = f"Kui palju on {esimene_arv} {aritmeetiline_tehe} {teine_arv}?"
-    return (küsimus,õige_vastus)
+    return (küsimus, õige_vastus)
 
 def õige_vale(mängija_vastus,eelmine_vastus):
     punktid = 0
