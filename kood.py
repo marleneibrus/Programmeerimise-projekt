@@ -38,13 +38,23 @@ y_muutus = 0
 # ==== KOOPA EHITAMISE JAOKS MÕELDUD ARVUTAMISMÄNG ====
 # funktsioon genereerib suvalise avaldise 
 def suvaline_avaldis():
-    esimene_arv = random.randint(0,10)
-    teine_arv = random.randint(1,10)
-    aritmeetilised_tehted = {"+": operator.add, "-": operator.sub, "*": operator.mul, "/": operator.truediv}
+    aritmeetilised_tehted = {"+": operator.add, "-": operator.sub, "*": operator.mul}
     aritmeetiline_tehe = random.choice(list(aritmeetilised_tehted.keys()))
+    
+    if aritmeetiline_tehe == "+":
+        esimene_arv = random.randint(0,100)
+        teine_arv = min (random.randint(0,100),100-esimene_arv)
+    elif aritmeetiline_tehe == "-":
+        teine_arv = random.randint(1,100)
+        esimene_arv = max(100- random.randint(0,100),teine_arv)
+        
+    elif aritmeetiline_tehe == "*":
+        esimene_arv = random.randint(1,10)
+        teine_arv = random.randint(0,10)    
+
     õige_vastus = aritmeetilised_tehted.get(aritmeetiline_tehe) (esimene_arv, teine_arv)
     küsimus = f"Kui palju on {esimene_arv} {aritmeetiline_tehe} {teine_arv}?"
-    return (küsimus,õige_vastus)
+    return (küsimus, õige_vastus)
 
 def õige_vale(mängija_vastus,eelmine_vastus):
     punktid = 0
@@ -66,8 +76,10 @@ def õige_vale(mängija_vastus,eelmine_vastus):
 base_font = pygame.font.Font(None,32)
 user_tekst = " "
 tehe = suvaline_avaldis()[0]
-koopa_asukoht = pygame.Rect(1000,600,220,200)
-koopa_värv = pygame.Color("black")
+koopa_asukoht = pygame.Rect(750,550,220,200)
+koopa_värv = pygame.Color(50,90,10)
+koopa_pilt = pygame.image.load("koobas.png").convert_alpha()
+koopa_pilt = pygame.transform.scale(koopa_pilt, (220, 200))
 klikk_kasti = False
 mängija_vastus = "puudub"
 avaldis = ("Kui palju on 1+1?",2)
@@ -122,6 +134,7 @@ while programm_käib:
     
   # tekitab koopa kasti, prindib tehte ja teeb koha, kuhu saab kirjutada. töötab ainult siis kui karu on kasti juures!
     pygame.draw.rect(ekraan,koopa_värv,koopa_asukoht,2)
+    ekraan.blit(koopa_pilt,koopa_asukoht)
     if i == 0:
         uus_tehe = True
         i += 1
@@ -133,11 +146,11 @@ while programm_käib:
             uus_tehe = False
         
         tehe = avaldis[0]
-        avaldise_kuvamine = base_font.render(tehe, True, (255,255,255))
+        avaldise_kuvamine = base_font.render(tehe, True, (0,0,0))
         ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x + 5, koopa_asukoht.y + 5))
         
         #mängija vastus
-        tekstipind = base_font.render(user_tekst, True, (255,255,255))
+        tekstipind = base_font.render(user_tekst, True, (0,0,0))
         ekraan.blit(tekstipind,(koopa_asukoht.x + 5, koopa_asukoht.y + 50))
         #koopa_asukoht.w = max(200, tekstipind.get_width() + 10)
 
@@ -146,7 +159,7 @@ while programm_käib:
         #print(mängija_vastus)
         #print(eelmine_vastus)
         #print(avaldis[1])
-        vastuse_õigsus_ekraanil = base_font.render(õige_vale(mängija_vastus,eelmine_vastus), True, (255,255,255))
+        vastuse_õigsus_ekraanil = base_font.render(õige_vale(mängija_vastus,eelmine_vastus), True, (0,0,0))
         ekraan.blit(vastuse_õigsus_ekraanil,(koopa_asukoht.x + 5,koopa_asukoht.y + 100))
         
 
