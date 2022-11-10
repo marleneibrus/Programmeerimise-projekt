@@ -24,7 +24,7 @@ valge = (255,255,255)
 # Meie karu nimi on Nefi
 nefi_pilt = pygame.image.load("Nefi_seisab.png").convert_alpha()
 nefi_pilt = pygame.transform.scale(nefi_pilt, (80, 100))
-rect1 = nefi_pilt.get_rect()
+#rect1 = nefi_pilt.get_rect()
 nefi_asukoht = pygame.Rect(0, 0, 80, 100)
 
 x = 0
@@ -35,18 +35,20 @@ y_muutus = 0
 
 # ==== MARJA GENEREERIMINE JA ÜLES KORJAMINE ====
 
-#mari_pilt = pygame.image.load('mari.png').convert_alpha()
-#mari_pilt = pygame.transform.scale(mari_pilt, (35, 35))
-#rect2 = mari_pilt.get_rect()
-#mari_asukoht = pygame.Rect(0, 0, 35, 35)
+mari_pilt = pygame.image.load('mari.png').convert_alpha()
+mari_pilt = pygame.transform.scale(mari_pilt, (35, 35))
+rect2 = mari_pilt.get_rect()
+mari_asukoht = pygame.Rect(0, 0, 35, 35)
+
+
 skoor = 0
 
-def mari_ilmub():
+""" def mari_ilmub():
     mari_pilt = pygame.image.load('mari.png').convert_alpha()
     mari_pilt = pygame.transform.scale(mari_pilt, (35, 35))
     mari_asukoht = (0, 0, randint(10, 990), randint(10, 700))
     ekraan.blit(mari_pilt, mari_asukoht)
-    pygame.display.flip()
+    pygame.display.flip() """
 
 
 # ==== TAIMER JA LÕPUEKRAAN ====
@@ -87,11 +89,11 @@ def suvaline_avaldis():
     küsimus = f"Kui palju on {esimene_arv} {aritmeetiline_tehe} {teine_arv}?"
     return (küsimus, õige_vastus)
 
-def õige_vale(mängija_vastus,õige_vastus):
+def õige_vale(mängija_vastus,eelmine_vastus):
     global skoor
     vastus = mängija_vastus.strip()
     try: 
-        if vastus == str(õige_vastus):
+        if vastus == str(eelmine_vastus):
             skoor += 20
             return "õige vastus!"
         elif vastus == "puudub":
@@ -205,6 +207,7 @@ while programm_käib:
 
         punktisumma(skoor)
         ekraan.blit(nefi_pilt, nefi_asukoht)
+        ekraan.blit(mari_pilt, mari_asukoht)
         nefi_asukoht.move_ip(x_muutus, y_muutus)
         nefi_asukoht.clamp_ip(ekraan.get_rect())
             
