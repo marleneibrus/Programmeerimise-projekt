@@ -52,7 +52,7 @@ skoor = 0
 
 
 # ==== TAIMER JA LÕPUEKRAAN ====
-taimer = datetime.datetime.utcnow() + datetime.timedelta(seconds=40)
+taimer = datetime.datetime.utcnow() + datetime.timedelta(seconds=240)
 
 def sõnum_ekraanile(tekst, font):
     tekstsurface = font.render(tekst, True, (255,255,255))
