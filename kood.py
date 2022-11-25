@@ -1,3 +1,6 @@
+# ==== PILDID JA ALLIKAD ====
+# 
+
 
 # ==== IMPORTIMINE ====
 import pygame
@@ -40,8 +43,18 @@ mari_pilt = pygame.transform.scale(mari_pilt, (35, 35))
 rect2 = mari_pilt.get_rect()
 mari_asukoht = pygame.Rect(0, 0, 35, 35)
 
+def mari_xy():
+    mari_x = 0 # SEAME MARJA X KOORDINAADI NULLI
+    mari_y = 0 # SEAME MARJA Y KOORDINAADI NULLI
+    mari_x = random.randint(20, 980)
+    mari_y = random.randint(20, 780)
+    return mari_x, mari_y
 
-skoor = 0
+def mari_ilmub(x):
+    mari_x, mari_y = mari_xy()
+    mari_x = int(mari_x)
+    mari_y = int(mari_y)
+    ekraan.blit(mari_pilt, (mari_x, mari_y))
 
 """ def mari_ilmub():
     mari_pilt = pygame.image.load('mari.png').convert_alpha()
@@ -51,9 +64,16 @@ skoor = 0
     pygame.display.flip() """
 
 
-# ==== TAIMER JA LÕPUEKRAAN ====
+# ==== TAIMER ====
 taimer = datetime.datetime.utcnow() + datetime.timedelta(seconds=240)
+def taimer_ekraanile(ekraan, x, y, aeg):
+    font = pygame.font.Font(None, 32)
+    tekst = font.render("Aega alles "+ str(aeg), 1, valge)
+    ekraan.blit(tekst, (x, y))
 
+
+
+# ==== LÕPUEKRAAN ====
 def sõnum_ekraanile(tekst, font):
     tekstsurface = font.render(tekst, True, (255,255,255))
     return tekstsurface, tekstsurface.get_rect()
@@ -123,101 +143,109 @@ i = 0
 def punktisumma(punktid):
     punkti_font = pygame.font.SysFont(None, 32)
     punktid_ekr = punkti_font.render('Punktid: '+str(punktid), True, (255,255,255))
-    ekraan.blit(punktid_ekr, (0,0))
+    ekraan.blit(punktid_ekr, (50, 750))
 
 skoor = 0
 
 
 # ==== MÄNG ====
 programm_käib = True
-mängu_aeg = True
 aja_muutuja = 10
+stardiaeg = pygame.time.get_ticks()
+
+mängu_aeg = 240 # kaua mäng kestab sekundites
+
 
 while programm_käib:
-    while mängu_aeg:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.display.quit()
-                pygame.quit()
-        
-            if datetime.datetime.utcnow() > taimer:
-                mängu_aeg = False
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if koopa_asukoht.collidepoint(event.pos):
-                    klikk_kasti = True
-                else:
-                    klikk_kasti = False
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    x_muutus = -2
-                elif event.key == pygame.K_RIGHT:
-                    x_muutus = 2
-                elif event.key == pygame.K_UP:
-                    y_muutus = -2
-                elif event.key == pygame.K_DOWN:
-                    y_muutus = 2
-
-                #lubab kirjutada/kustutada kui kastile on klikitud
-                if klikk_kasti == True:
-                    if event.key == pygame.K_BACKSPACE:
-                        user_tekst = user_tekst[:-1]
-                    else:
-                        user_tekst += event.unicode
-                    if event.key == pygame.K_RETURN:
-                        mängija_vastus = user_tekst
-                        user_tekst = ""
-                        uus_tehe = True
-        
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                    x_muutus = 0
-                    y_muutus = 0
-
-
-        # tekitab koopa kasti, prindib tehte ja teeb koha, kuhu saab kirjutada. töötab ainult siis kui karu on kasti juures!
-        pygame.draw.rect(ekraan,koopa_värv,koopa_asukoht,2)
-        ekraan.blit(koopa_pilt,koopa_asukoht)
-        if i == 0:
-            uus_tehe = True
-            i += 1
-        if nefi_asukoht.colliderect(koopa_asukoht):
-             #küsimuse moodustamine
-            vana_avaldis = avaldis
-            if uus_tehe == True:
-                avaldis = suvaline_avaldis()
-                uus_tehe = False
-
-            tehe = avaldis[0]
-            avaldise_kuvamine = base_font.render(tehe, True, (0,0,0))
-            ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x + 5, koopa_asukoht.y + 5))
-        
-                #mängija vastus
-            tekstipind = base_font.render(user_tekst, True, (0,0,0))
-            ekraan.blit(tekstipind,(koopa_asukoht.x + 5, koopa_asukoht.y + 50))
-            #koopa_asukoht.w = max(200, tekstipind.get_width() + 10)
-            #vastuse õigsuse kontroll 
-            eelmine_vastus = vana_avaldis[1]
-                #print(mängija_vastus)
-                #print(eelmine_vastus)
-                #print(avaldis[1])
-            vastuse_õigsus_ekraanil = base_font.render(õige_vale(mängija_vastus,eelmine_vastus), True, (0,0,0))
-            ekraan.blit(vastuse_õigsus_ekraanil,(koopa_asukoht.x + 5,koopa_asukoht.y + 100))
-
-        punktisumma(skoor)
-        ekraan.blit(nefi_pilt, nefi_asukoht)
-        ekraan.blit(mari_pilt, mari_asukoht)
-        nefi_asukoht.move_ip(x_muutus, y_muutus)
-        nefi_asukoht.clamp_ip(ekraan.get_rect())
-            
-        pygame.display.flip()
-
-        ekraan.fill(taustavärv)
     
-    sõnum('Mäng läbi!')
-    time.sleep(5)
-    sõnum(f'Sinu skoor on {skoor}')
-    time.sleep(5)
-    pygame.display.quit()
-    pygame.quit()
+    aega_alles = pygame.time.get_ticks() - stardiaeg
+    aega_alles = aega_alles / 1000
+    aega_alles = mängu_aeg - aega_alles
+    aega_alles = int(aega_alles)
+    taimer_ekraanile(ekraan, 50, 50, aega_alles)
+
+    if aega_alles % 15 == 0:
+        mari_ilmub
+    
+    mari_ilmub(x)
+
+    if (stardiaeg + (mängu_aeg * 1000)) <= pygame.time.get_ticks():
+        programm_käib = False
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.display.quit()
+            pygame.quit()
+            stardiaeg = pygame.time.get_ticks()
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if koopa_asukoht.collidepoint(event.pos):
+                klikk_kasti = True
+            else:
+                klikk_kasti = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                x_muutus = -2
+            elif event.key == pygame.K_RIGHT:
+                x_muutus = 2
+            elif event.key == pygame.K_UP:
+                y_muutus = -2
+            elif event.key == pygame.K_DOWN:
+                y_muutus = 2
+
+            #lubab kirjutada/kustutada kui kastile on klikitud
+            if klikk_kasti == True:
+                if event.key == pygame.K_BACKSPACE:
+                    user_tekst = user_tekst[:-1]
+                else:
+                    user_tekst += event.unicode
+                if event.key == pygame.K_RETURN:
+                    mängija_vastus = user_tekst
+                    user_tekst = ""
+                    uus_tehe = True
+    
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                x_muutus = 0
+                y_muutus = 0
+
+
+    # tekitab koopa kasti, prindib tehte ja teeb koha, kuhu saab kirjutada. töötab ainult siis kui karu on kasti juures!
+    pygame.draw.rect(ekraan,koopa_värv,koopa_asukoht,2)
+    ekraan.blit(koopa_pilt,koopa_asukoht)
+    if i == 0:
+        uus_tehe = True
+        i += 1
+    if nefi_asukoht.colliderect(koopa_asukoht):
+            #küsimuse moodustamine
+        vana_avaldis = avaldis
+        if uus_tehe == True:
+            avaldis = suvaline_avaldis()
+            uus_tehe = False
+
+        tehe = avaldis[0]
+        avaldise_kuvamine = base_font.render(tehe, True, (0,0,0))
+        ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x + 5, koopa_asukoht.y + 5))
+    
+            #mängija vastus
+        tekstipind = base_font.render(user_tekst, True, (0,0,0))
+        ekraan.blit(tekstipind,(koopa_asukoht.x + 5, koopa_asukoht.y + 50))
+        #koopa_asukoht.w = max(200, tekstipind.get_width() + 10)
+        #vastuse õigsuse kontroll 
+        eelmine_vastus = vana_avaldis[1]
+            #print(mängija_vastus)
+            #print(eelmine_vastus)
+            #print(avaldis[1])
+        vastuse_õigsus_ekraanil = base_font.render(õige_vale(mängija_vastus,eelmine_vastus), True, (0,0,0))
+        ekraan.blit(vastuse_õigsus_ekraanil,(koopa_asukoht.x + 5,koopa_asukoht.y + 100))
+
+    punktisumma(skoor)
+    ekraan.blit(nefi_pilt, nefi_asukoht)
+    ekraan.blit(mari_pilt, mari_asukoht)
+    nefi_asukoht.move_ip(x_muutus, y_muutus)
+    nefi_asukoht.clamp_ip(ekraan.get_rect())
+        
+    pygame.display.flip()
+
+    ekraan.fill(taustavärv)
+
