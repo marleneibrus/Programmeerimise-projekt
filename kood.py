@@ -89,17 +89,52 @@ def sõnum(sõnum):
     
 
 # ==== KOOPA EHITAMISE JAOKS MÕELDUD ARVUTAMISMÄNG ====
+
+# ==== KOOBAS ====
+base_font = pygame.font.Font(None,32)
+user_tekst = ""
+koopa_asukoht = pygame.Rect(750,550,220,200)
+koopa_värv = pygame.Color(50,90,10)
+koopa_pilt = pygame.image.load("koobas.png").convert_alpha()
+koopa_pilt = pygame.transform.scale(koopa_pilt, (220, 200))
+mängija_vastus = "1000"
+indeks = 0 #on välimise jrj indeksiks 
+tõeväärtus = ""
+arv = 0
+i = 0
+koopa_punktid = 0
+
+# ==== protsendi pildid =======
+protsent0 = pygame.image.load("protsendid/nullprotsenti.png").convert_alpha()
+protsent0 = pygame.transform.scale(protsent0,(200, 30))
+protsent = pygame.Rect(770,735,200,30)
+
+protsent25 = pygame.image.load("protsendid/kakskümmendviis.png").convert_alpha()
+protsent25 = pygame.transform.scale(protsent25,(200, 30))
+
+protsent50 = pygame.image.load("protsendid/viiskümmend.png").convert_alpha()
+protsent50 = pygame.transform.scale(protsent50,(200, 30))
+
+protsent75 = pygame.image.load("protsendid/seitsekümmendviis.png").convert_alpha()
+protsent75 = pygame.transform.scale(protsent75,(200, 30))
+
+protsent100 = pygame.image.load("protsendid/sadaprotsenti.png").convert_alpha()
+protsent100 = pygame.transform.scale(protsent100,(200, 30))
+
 # funktsioon genereerib suvalise avaldise 
-def suvaline_avaldis():
+def suvaline_avaldis_kerge():
     aritmeetilised_tehted = {"+": operator.add, "-": operator.sub, "*": operator.mul}
     aritmeetiline_tehe = random.choice(list(aritmeetilised_tehted.keys()))
     
     if aritmeetiline_tehe == "+":
         esimene_arv = random.randint(0,100)
-        teine_arv = min (random.randint(0,100),100-esimene_arv)
+        if esimene_arv > 50:
+            teine_arv = random.randint(0,100-esimene_arv)
+        else:
+            teine_arv = random.randint(0,esimene_arv)
     elif aritmeetiline_tehe == "-":
-        teine_arv = random.randint(1,100)
-        esimene_arv = max(100- random.randint(0,100),teine_arv)
+        esimene_arv = random.randint(0,100)
+        teine_arv = random.randint(0,esimene_arv)
         
     elif aritmeetiline_tehe == "*":
         esimene_arv = random.randint(1,10)
@@ -107,37 +142,79 @@ def suvaline_avaldis():
 
     õige_vastus = aritmeetilised_tehted.get(aritmeetiline_tehe) (esimene_arv, teine_arv)
     küsimus = f"Kui palju on {esimene_arv} {aritmeetiline_tehe} {teine_arv}?"
-    return (küsimus, õige_vastus)
+    return (õige_vastus, küsimus)
 
-def õige_vale(mängija_vastus,eelmine_vastus):
-    global skoor
-    vastus = mängija_vastus.strip()
-    try: 
-        if vastus == str(eelmine_vastus):
-            skoor += 20
-            return "õige vastus!"
-        elif vastus == "puudub":
-            return "ootan vastust"
-        else: 
-            skoor -= 10
-            return "ei tea veel tõeväärtust :("
-    except:
-        return -1
+def suvaline_avaldis_raske():
+    aritmeetilised_tehted = {"+": operator.add, "-": operator.sub, "*": operator.mul}
+    aritmeetiline_tehe = random.choice(list(aritmeetilised_tehted.keys()))
+    
+    if aritmeetiline_tehe == "+":
+        esimene_arv = random.randint(0,1000)
+        if esimene_arv > 50:
+            teine_arv = random.randint(0,1000-esimene_arv)
+        else:
+            teine_arv = random.randint(0,esimene_arv)
+    elif aritmeetiline_tehe == "-":
+        esimene_arv = random.randint(0,1000)
+        teine_arv = random.randint(0,esimene_arv)
+        
+    elif aritmeetiline_tehe == "*":
+        esimene_arv = random.randint(1,10)
+        teine_arv = random.randint(0,20)    
 
+    õige_vastus = aritmeetilised_tehted.get(aritmeetiline_tehe) (esimene_arv, teine_arv)
+    küsimus = f"Kui palju on {esimene_arv} {aritmeetiline_tehe} {teine_arv}?"
+    return (õige_vastus, küsimus)
 
-# ==== KOOBAS ====
-base_font = pygame.font.Font(None,32)
-user_tekst = " "
-tehe = suvaline_avaldis()[0]
-koopa_asukoht = pygame.Rect(750,550,220,200)
-koopa_värv = pygame.Color(50,90,10)
-koopa_pilt = pygame.image.load("koobas.png").convert_alpha()
-koopa_pilt = pygame.transform.scale(koopa_pilt, (220, 200))
-klikk_kasti = False
-mängija_vastus = "puudub"
-avaldis = ("Kui palju on 1+1?",2)
-i = 0
+def kakskümmmend_suvalist_avaldist_kerge():
+    jrj = []
+    lst = []
+    j = 0
+    while j < 20:
+        jrj += suvaline_avaldis_kerge()
+        j += 1
+        lst.append(jrj)
+        jrj = []
+    return lst
 
+def kakskümmmend_suvalist_avaldist_raske():
+    jrj = []
+    lst = []
+    j = 0
+    while j < 20:
+        jrj += suvaline_avaldis_raske()
+        j += 1
+        lst.append(jrj)
+        jrj = []
+    return lst
+
+def punktiskaala(punktid):
+    if punktid < 50:
+        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
+        ekraan.blit(protsent0,protsent)
+    elif 50 <= punktid < 100:
+        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
+        ekraan.blit(protsent25,protsent)
+    elif 100 <= punktid < 150:
+        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
+        ekraan.blit(protsent50,protsent) 
+    elif 150 <= punktid < 200:
+        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
+        ekraan.blit(protsent75,protsent)
+    else:
+        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
+        ekraan.blit(protsent100,protsent) 
+
+def koopa_lõpp(koopa_punktid):
+    koopa_seis = round(koopa_punktid / 200 * 100, 1)
+    if koopa_seis <= 0:
+        koopa_seis_ekraanil = f"Koobas on väga halvas seisus"
+    elif 0 < koopa_seis < 100:
+        koopa_seis_ekraanil = f"Koobas on {koopa_seis}% valmis"
+    else:
+        koopa_seis_ekraanil = "Koobas on talveks valmis!"
+    koopa_lõpp = base_font.render(koopa_seis_ekraanil,True,(255,255,255))
+    ekraan.blit(koopa_lõpp,(koopa_asukoht.x - 90, koopa_asukoht.y + 35)) 
 
 # ==== PUNKTID ====
 def punktisumma(punktid):
