@@ -254,12 +254,6 @@ while programm_käib:
             pygame.quit()
             stardiaeg = pygame.time.get_ticks()
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if koopa_asukoht.collidepoint(event.pos):
-                klikk_kasti = True
-            else:
-                klikk_kasti = False
-
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 x_muutus = -2
@@ -269,52 +263,122 @@ while programm_käib:
                 y_muutus = -2
             elif event.key == pygame.K_DOWN:
                 y_muutus = 2
-
-            #lubab kirjutada/kustutada kui kastile on klikitud
-            if klikk_kasti == True:
-                if event.key == pygame.K_BACKSPACE:
-                    user_tekst = user_tekst[:-1]
-                else:
-                    user_tekst += event.unicode
-                if event.key == pygame.K_RETURN:
-                    mängija_vastus = user_tekst
-                    user_tekst = ""
-                    uus_tehe = True
+            
+            if event.key == pygame.K_BACKSPACE:
+                user_tekst = user_tekst[:-1]
+            else:
+                user_tekst += event.unicode
+            if event.key == pygame.K_RETURN:
+                mängija_vastus = user_tekst
+                user_tekst = ""
+                uus_tehe = True
+                arv = 1
     
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                 x_muutus = 0
                 y_muutus = 0
 
-
+    #===koopamäng===
     # tekitab koopa kasti, prindib tehte ja teeb koha, kuhu saab kirjutada. töötab ainult siis kui karu on kasti juures!
     pygame.draw.rect(ekraan,koopa_värv,koopa_asukoht,2)
     ekraan.blit(koopa_pilt,koopa_asukoht)
-    if i == 0:
-        uus_tehe = True
-        i += 1
-    if nefi_asukoht.colliderect(koopa_asukoht):
-            #küsimuse moodustamine
-        vana_avaldis = avaldis
-        if uus_tehe == True:
-            avaldis = suvaline_avaldis()
-            uus_tehe = False
 
-        tehe = avaldis[0]
-        avaldise_kuvamine = base_font.render(tehe, True, (0,0,0))
-        ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x + 5, koopa_asukoht.y + 5))
-    
-            #mängija vastus
-        tekstipind = base_font.render(user_tekst, True, (0,0,0))
-        ekraan.blit(tekstipind,(koopa_asukoht.x + 5, koopa_asukoht.y + 50))
-        #koopa_asukoht.w = max(200, tekstipind.get_width() + 10)
-        #vastuse õigsuse kontroll 
-        eelmine_vastus = vana_avaldis[1]
-            #print(mängija_vastus)
-            #print(eelmine_vastus)
-            #print(avaldis[1])
-        vastuse_õigsus_ekraanil = base_font.render(õige_vale(mängija_vastus,eelmine_vastus), True, (0,0,0))
-        ekraan.blit(vastuse_õigsus_ekraanil,(koopa_asukoht.x + 5,koopa_asukoht.y + 100))
+    if nefi_asukoht.colliderect(koopa_asukoht) and indeks <= 18:
+        if koopa_punktid < 200: # koopa eest saab maksimaalselt 200 punkti  
+
+            #kui mängija on saanud üle 100 punkti lähevad ülesanded raskemaks 
+            if koopa_punktid > 100:
+                raskuse_muutmine = True
+            else:
+                raskuse_muutmine = False
+            if i == 0:
+                uus_tehe = False
+                jrj_kergem = kakskümmmend_suvalist_avaldist_kerge()
+                avaldis = jrj_kergem[indeks]
+                küsimus = jrj_kergem[indeks][1]
+                vastus = avaldis[0]
+                jrj_raskem = kakskümmmend_suvalist_avaldist_raske()
+                i += 1
+                raskuse_muutmine = False
+
+            if uus_tehe == True and raskuse_muutmine == False:
+                avaldis = jrj_kergem[indeks]
+                küsimus = jrj_kergem[indeks+1][1]
+
+                if indeks == 2:
+                    vastus = jrj_kergem[1][0]
+                else:
+                    vastus = avaldis[0]
+                uus_tehe = False
+            elif uus_tehe == True and raskuse_muutmine == True:
+                    avaldis = jrj_raskem[indeks]
+                    küsimus = jrj_raskem[indeks+1][1]
+
+                    if indeks == 2:
+                        vastus = jrj_raskem[1][0]
+                    else:
+                        vastus = avaldis[0]
+                    uus_tehe = False
+            
+            #print(jrj_kergem)
+            #print(jrj_raskem)
+            
+            #prindib küsimuse ekraanile 
+            avaldise_kuvamine = base_font.render(küsimus, True, (0,0,0))
+            ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x + 5, koopa_asukoht.y + 5))
+
+            #mängija vastus ekraanil 
+            text_surface = base_font.render(user_tekst,True,(255,255,255))
+            ekraan.blit(text_surface,(koopa_asukoht.x + 5, koopa_asukoht.y + 35))
+
+            #Kontrollib mängija vastuse õigsust ja annab punkte (-10 või +20)
+            mängija_vastus = mängija_vastus.strip()
+            if indeks >= 1:
+                    õige_vale = tõeväärtus
+            else:
+                    õige_vale = "sisesta vastus"
+            
+            #leiab, kas vastus on õige või vale 
+            if i == 1:
+                if int(mängija_vastus) == vastus:
+                    tõeväärtus = 'õige vastus '
+                    i += 1
+                    indeks += 1
+                elif mängija_vastus == "1000":
+                    tõeväärtus = ""
+                else:
+                    tõeväärtus = "vale vastus"
+                    i += 1
+                    indeks += 1
+                
+            else:
+                if arv == 1:
+                    if mängija_vastus == "":
+                        tõeväärtus = "vale vastus"
+                        skoor -= 10
+                        koopa_punktid -= 10
+                        indeks += 1
+                    elif int(mängija_vastus) == vastus:
+                        tõeväärtus = 'õige vastus'
+                        skoor += 20
+                        koopa_punktid += 20
+                        indeks += 1
+                    else:
+                        tõeväärtus = "vale vastus"
+                        skoor -= 10
+                        koopa_punktid -= 10
+                        indeks += 1
+                    arv = 0
+            
+            #kuvab ekraanile, kas vastus oli õige/vale ja lisab punktiskaala
+            output_surface = base_font.render(õige_vale,True,(255,255,255))
+            ekraan.blit(output_surface,(koopa_asukoht.x + 5, koopa_asukoht.y + 60))
+            punktiskaala(koopa_punktid)
+    else:
+        punktiskaala(koopa_punktid)
+        koopa_lõpp(koopa_punktid)
+
 
     punktisumma(skoor)
     ekraan.blit(nefi_pilt, nefi_asukoht)
