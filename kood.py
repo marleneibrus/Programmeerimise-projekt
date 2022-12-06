@@ -1,5 +1,6 @@
 # ==== PILDID JA ALLIKAD ====
-# 
+# algus: https://labs.openai.com/e/1eKTRFCMXiySzw8GyvX3L43B/eDSvG8JU9axcTye8dpdbcXs2
+# koobas: https://labs.openai.com/e/LEE3GR0UIG5HgF4uZ6J5hvA0/3CSgvtud7Xs8qMeMidW8cYNV
 
 
 # ==== IMPORTIMINE ====
@@ -67,8 +68,13 @@ def mari_ilmub(x):
 # ==== TAIMER ====
 taimer = datetime.datetime.utcnow() + datetime.timedelta(seconds=240)
 def taimer_ekraanile(ekraan, x, y, aeg):
-    font = pygame.font.Font(None, 32)
-    tekst = font.render("Aega alles "+ str(aeg), 1, valge)
+    minutid = aeg // 60
+    sekundid = aeg - minutid * 60 
+    font = pygame.font.Font("PressStart2P-Regular.ttf", 15)
+    if minutid > 0:
+        tekst = font.render("Aega alles: "+ str(minutid) + "min ja " +str(sekundid)+ "s", 1, valge)
+    else:
+        tekst = font.render("Aega alles: " +str(sekundid)+ "s", 1, valge)
     ekraan.blit(tekst, (x, y))
 
 
@@ -91,13 +97,14 @@ def sõnum(sõnum):
 # ==== KOOPA EHITAMISE JAOKS MÕELDUD ARVUTAMISMÄNG ====
 
 # ==== KOOBAS ====
-base_font = pygame.font.Font(None,32)
+base_font = pygame.font.Font("PressStart2P-Regular.ttf", 15)
+base_font2 = pygame.font.Font("PressStart2P-Regular.ttf", 25)
 user_tekst = ""
-koopa_asukoht = pygame.Rect(750,550,220,200)
+koopa_asukoht = pygame.Rect(670,550,220,200)
 koopa_värv = pygame.Color(50,90,10)
-koopa_pilt = pygame.image.load("koobas.png").convert_alpha()
-koopa_pilt = pygame.transform.scale(koopa_pilt, (220, 200))
-mängija_vastus = "1000"
+koopa_pilt = pygame.image.load("karukoobas.png").convert_alpha()
+koopa_pilt = pygame.transform.scale(koopa_pilt, (270, 200))
+mängija_vastus = "10000"
 indeks = 0 #on välimise jrj indeksiks 
 tõeväärtus = ""
 arv = 0
@@ -107,7 +114,7 @@ koopa_punktid = 0
 # ==== protsendi pildid =======
 protsent0 = pygame.image.load("protsendid/nullprotsenti.png").convert_alpha()
 protsent0 = pygame.transform.scale(protsent0,(200, 30))
-protsent = pygame.Rect(770,735,200,30)
+protsent = pygame.Rect(715,745,200,30)
 
 protsent25 = pygame.image.load("protsendid/kakskümmendviis.png").convert_alpha()
 protsent25 = pygame.transform.scale(protsent25,(200, 30))
@@ -190,43 +197,100 @@ def kakskümmmend_suvalist_avaldist_raske():
 
 def punktiskaala(punktid):
     if punktid < 50:
-        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
         ekraan.blit(protsent0,protsent)
     elif 50 <= punktid < 100:
-        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
         ekraan.blit(protsent25,protsent)
     elif 100 <= punktid < 150:
-        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
         ekraan.blit(protsent50,protsent) 
     elif 150 <= punktid < 200:
-        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
         ekraan.blit(protsent75,protsent)
     else:
-        pygame.draw.rect(ekraan,koopa_värv,protsent,2)
         ekraan.blit(protsent100,protsent) 
 
 def koopa_lõpp(koopa_punktid):
-    koopa_seis = round(koopa_punktid / 200 * 100, 1)
+    koopa_seis = round(koopa_punktid / 200 * 100)
     if koopa_seis <= 0:
-        koopa_seis_ekraanil = f"Koobas on väga halvas seisus"
+        koopa_seis_ekraanil = f"Ehita koobast"
+        x = 40
     elif 0 < koopa_seis < 100:
         koopa_seis_ekraanil = f"Koobas on {koopa_seis}% valmis"
+        x = -5
     else:
         koopa_seis_ekraanil = "Koobas on talveks valmis!"
+        x = -50
     koopa_lõpp = base_font.render(koopa_seis_ekraanil,True,(255,255,255))
-    ekraan.blit(koopa_lõpp,(koopa_asukoht.x - 90, koopa_asukoht.y + 35)) 
+    ekraan.blit(koopa_lõpp,(koopa_asukoht.x + x, koopa_asukoht.y - 30)) 
 
 # ==== PUNKTID ====
 def punktisumma(punktid):
-    punkti_font = pygame.font.SysFont(None, 32)
+    punkti_font = pygame.font.Font("PressStart2P-Regular.ttf", 15)
     punktid_ekr = punkti_font.render('Punktid: '+str(punktid), True, (255,255,255))
     ekraan.blit(punktid_ekr, (50, 750))
 
 skoor = 0
+# ==== KUIDAS MÄNGIDA ====
+def õpetuseleht():
+    õpetus = True
+    tagasi = pygame.Rect(390,700,220,80)
+    taustavärv = (22,16,7)
 
+    taust = pygame.image.load("juhend_tekst.png")
+    while õpetus:
+        juhend = pygame.image.load("juhend_tekst.png").convert_alpha()
+        juhend = pygame.transform.scale(juhend, (1000, 800))
+        ekraan.blit(juhend,(0,0))
+
+        mängima_nupp = pygame.image.load("mängima_nupp.png").convert_alpha()
+        mängima_nupp = pygame.transform.scale(mängima_nupp, (220, 80))
+        ekraan.blit(mängima_nupp,tagasi)
+       
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                õpetus = False
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if tagasi.collidepoint(event.pos):
+                    õpetus = False
+                    return True
+        pygame.display.flip()
+
+        ekraan.fill(taustavärv)
+
+# ==== ALGUS ====
+def algusleht(õpetuseleht):
+    taust = pygame.image.load("alguspilt3.png")
+    algus = True
+    mängima_asukoht = pygame.Rect(390,400,220,80)
+    õpetus_asukoht = pygame.Rect(390,500,220,80)
+    while algus:
+        
+        ekraan.blit(taust,(0,0))
+        mängima_nupp = pygame.image.load("mängima_nupp.png").convert_alpha()
+        mängima_nupp = pygame.transform.scale(mängima_nupp, (220, 80))
+        ekraan.blit(mängima_nupp,mängima_asukoht)
+        juhend_nupp = pygame.image.load("juhend.png").convert_alpha()
+        juhend_nupp = pygame.transform.scale(juhend_nupp, (220, 80))
+        ekraan.blit(juhend_nupp,õpetus_asukoht)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                algus = False
+                
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if mängima_asukoht.collidepoint(event.pos):
+                    algus = False
+                    return True
+                elif õpetus_asukoht.collidepoint(event.pos):
+                    algus = False
+                    õpetuseleht = õpetuseleht()
+                    return õpetuseleht
+                
+        pygame.display.flip()
+
+        ekraan.fill(taustavärv)
+    
 
 # ==== MÄNG ====
-programm_käib = True
+programm_käib = algusleht(õpetuseleht)
 aja_muutuja = 10
 stardiaeg = pygame.time.get_ticks()
 
@@ -279,12 +343,12 @@ while programm_käib:
                 x_muutus = 0
                 y_muutus = 0
 
-    #===koopamäng===
+    # ==== KOOPAMÄNG ==== 
     # tekitab koopa kasti, prindib tehte ja teeb koha, kuhu saab kirjutada. töötab ainult siis kui karu on kasti juures!
     pygame.draw.rect(ekraan,koopa_värv,koopa_asukoht,2)
     ekraan.blit(koopa_pilt,koopa_asukoht)
-
-    if nefi_asukoht.colliderect(koopa_asukoht) and indeks <= 18:
+    
+    if  nefi_asukoht.colliderect(koopa_asukoht) and indeks <= 18:
         if koopa_punktid < 200: # koopa eest saab maksimaalselt 200 punkti  
 
             #kui mängija on saanud üle 100 punkti lähevad ülesanded raskemaks 
@@ -321,23 +385,23 @@ while programm_käib:
                         vastus = avaldis[0]
                     uus_tehe = False
             
-            #print(jrj_kergem)
-            #print(jrj_raskem)
+            print(jrj_kergem)
+            print(jrj_raskem)
             
             #prindib küsimuse ekraanile 
-            avaldise_kuvamine = base_font.render(küsimus, True, (0,0,0))
-            ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x + 5, koopa_asukoht.y + 5))
+            avaldise_kuvamine = base_font.render(küsimus, True, (255,255,255))
+            ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x - 15, koopa_asukoht.y - 20))
 
             #mängija vastus ekraanil 
-            text_surface = base_font.render(user_tekst,True,(255,255,255))
-            ekraan.blit(text_surface,(koopa_asukoht.x + 5, koopa_asukoht.y + 35))
+            text_surface = base_font2.render(user_tekst,True,(0,0,0))
+            ekraan.blit(text_surface,(koopa_asukoht.x + 80, koopa_asukoht.y + 15))
 
             #Kontrollib mängija vastuse õigsust ja annab punkte (-10 või +20)
             mängija_vastus = mängija_vastus.strip()
             if indeks >= 1:
                     õige_vale = tõeväärtus
             else:
-                    õige_vale = "sisesta vastus"
+                    õige_vale = " "
             
             #leiab, kas vastus on õige või vale 
             if i == 1:
@@ -345,7 +409,7 @@ while programm_käib:
                     tõeväärtus = 'õige vastus '
                     i += 1
                     indeks += 1
-                elif mängija_vastus == "1000":
+                elif mängija_vastus == "10000":
                     tõeväärtus = ""
                 else:
                     tõeväärtus = "vale vastus"
@@ -373,7 +437,7 @@ while programm_käib:
             
             #kuvab ekraanile, kas vastus oli õige/vale ja lisab punktiskaala
             output_surface = base_font.render(õige_vale,True,(255,255,255))
-            ekraan.blit(output_surface,(koopa_asukoht.x + 5, koopa_asukoht.y + 60))
+            ekraan.blit(output_surface,(koopa_asukoht.x + 55, koopa_asukoht.y + 140))
             punktiskaala(koopa_punktid)
     else:
         punktiskaala(koopa_punktid)
