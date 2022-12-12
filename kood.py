@@ -1,6 +1,9 @@
 # ==== PILDID JA ALLIKAD ====
 # algus: https://labs.openai.com/e/1eKTRFCMXiySzw8GyvX3L43B/eDSvG8JU9axcTye8dpdbcXs2
-# koobas: https://labs.openai.com/e/LEE3GR0UIG5HgF4uZ6J5hvA0/3CSgvtud7Xs8qMeMidW8cYNV
+# taust: https://www.wallpaperflare.com/green-pine-trees-illustration-pixel-art-minimalism-sky-green-color-wallpaper-mllhy
+# koobas: https://www.pinterest.com/pin/102316222764332234/
+# koobas: https://labs.openai.com/e/LEE3GR0UIG5HgF4uZ6J5hvA0/3CSgvtud7Xs8qMeMidW8cYNV 
+# koobas õige: https://labs.openai.com/e/LEE3GR0UIG5HgF4uZ6J5hvA0/gfoz9yWJBi7W5ZCQCM3XLK6f
 
 
 # ==== IMPORTIMINE ====
@@ -19,7 +22,8 @@ pygame.init()
 ekraan = pygame.display.set_mode((kõrgus, laius))
 pygame.display.set_caption('Nefi matemaatikamäng :3')
 fullscreen = False
-
+taust = pygame.image.load("taust2.jpg")
+taust = pygame.transform.scale(taust, (1000, 800))
 taustavärv = (50,90,10)
 valge = (255,255,255)
 
@@ -29,7 +33,7 @@ valge = (255,255,255)
 nefi_pilt = pygame.image.load("Nefi_seisab.png").convert_alpha()
 nefi_pilt = pygame.transform.scale(nefi_pilt, (80, 100))
 #rect1 = nefi_pilt.get_rect()
-nefi_asukoht = pygame.Rect(0, 0, 80, 100)
+nefi_asukoht = pygame.Rect(100, 430, 80, 100)
 
 x = 0
 y = 0
@@ -101,9 +105,9 @@ base_font = pygame.font.Font("PressStart2P-Regular.ttf", 15)
 base_font2 = pygame.font.Font("PressStart2P-Regular.ttf", 25)
 user_tekst = ""
 koopa_asukoht = pygame.Rect(670,550,220,200)
-koopa_värv = pygame.Color(50,90,10)
-koopa_pilt = pygame.image.load("karukoobas.png").convert_alpha()
-koopa_pilt = pygame.transform.scale(koopa_pilt, (270, 200))
+koopa_värv = pygame.Color(124,212,52)
+koopa_pilt = pygame.image.load("koobas2.png").convert_alpha()
+koopa_pilt = pygame.transform.scale(koopa_pilt, (300, 300))
 mängija_vastus = "10000"
 indeks = 0 #on välimise jrj indeksiks 
 tõeväärtus = ""
@@ -114,7 +118,7 @@ koopa_punktid = 0
 # ==== protsendi pildid =======
 protsent0 = pygame.image.load("protsendid/nullprotsenti.png").convert_alpha()
 protsent0 = pygame.transform.scale(protsent0,(200, 30))
-protsent = pygame.Rect(715,745,200,30)
+protsent = pygame.Rect(710,745,200,30)
 
 protsent25 = pygame.image.load("protsendid/kakskümmendviis.png").convert_alpha()
 protsent25 = pygame.transform.scale(protsent25,(200, 30))
@@ -177,8 +181,13 @@ def kakskümmmend_suvalist_avaldist_kerge():
     jrj = []
     lst = []
     j = 0
-    while j < 20:
+    while j < 10:
         jrj += suvaline_avaldis_kerge()
+        j += 1
+        lst.append(jrj)
+        jrj = []
+    while j < 20:
+        jrj += suvaline_avaldis_raske()
         j += 1
         lst.append(jrj)
         jrj = []
@@ -298,6 +307,8 @@ mängu_aeg = 240 # kaua mäng kestab sekundites
 
 
 while programm_käib:
+
+    ekraan.blit(taust,(0,0))
     
     aega_alles = pygame.time.get_ticks() - stardiaeg
     aega_alles = aega_alles / 1000
@@ -346,55 +357,38 @@ while programm_käib:
     # ==== KOOPAMÄNG ==== 
     # tekitab koopa kasti, prindib tehte ja teeb koha, kuhu saab kirjutada. töötab ainult siis kui karu on kasti juures!
     pygame.draw.rect(ekraan,koopa_värv,koopa_asukoht,2)
-    ekraan.blit(koopa_pilt,koopa_asukoht)
+    ekraan.blit(koopa_pilt,(koopa_asukoht.x - 10, koopa_asukoht.y-60))
     
     if  nefi_asukoht.colliderect(koopa_asukoht) and indeks <= 18:
         if koopa_punktid < 200: # koopa eest saab maksimaalselt 200 punkti  
-
-            #kui mängija on saanud üle 100 punkti lähevad ülesanded raskemaks 
-            if koopa_punktid > 100:
-                raskuse_muutmine = True
-            else:
-                raskuse_muutmine = False
             if i == 0:
                 uus_tehe = False
                 jrj_kergem = kakskümmmend_suvalist_avaldist_kerge()
                 avaldis = jrj_kergem[indeks]
                 küsimus = jrj_kergem[indeks][1]
                 vastus = avaldis[0]
-                jrj_raskem = kakskümmmend_suvalist_avaldist_raske()
                 i += 1
-                raskuse_muutmine = False
 
-            if uus_tehe == True and raskuse_muutmine == False:
+            if uus_tehe == True:
                 avaldis = jrj_kergem[indeks]
-                küsimus = jrj_kergem[indeks+1][1]
+                
+                küsimus = jrj_kergem[indeks+1][1]    
 
                 if indeks == 2:
                     vastus = jrj_kergem[1][0]
                 else:
                     vastus = avaldis[0]
                 uus_tehe = False
-            elif uus_tehe == True and raskuse_muutmine == True:
-                    avaldis = jrj_raskem[indeks]
-                    küsimus = jrj_raskem[indeks+1][1]
-
-                    if indeks == 2:
-                        vastus = jrj_raskem[1][0]
-                    else:
-                        vastus = avaldis[0]
-                    uus_tehe = False
             
             print(jrj_kergem)
-            print(jrj_raskem)
             
             #prindib küsimuse ekraanile 
             avaldise_kuvamine = base_font.render(küsimus, True, (255,255,255))
             ekraan.blit(avaldise_kuvamine,(koopa_asukoht.x - 15, koopa_asukoht.y - 20))
 
             #mängija vastus ekraanil 
-            text_surface = base_font2.render(user_tekst,True,(0,0,0))
-            ekraan.blit(text_surface,(koopa_asukoht.x + 80, koopa_asukoht.y + 15))
+            text_surface = base_font2.render(user_tekst,True,(255,255,255))
+            ekraan.blit(text_surface,(koopa_asukoht.x + 108, koopa_asukoht.y + 15))
 
             #Kontrollib mängija vastuse õigsust ja annab punkte (-10 või +20)
             mängija_vastus = mängija_vastus.strip()
@@ -437,7 +431,7 @@ while programm_käib:
             
             #kuvab ekraanile, kas vastus oli õige/vale ja lisab punktiskaala
             output_surface = base_font.render(õige_vale,True,(255,255,255))
-            ekraan.blit(output_surface,(koopa_asukoht.x + 55, koopa_asukoht.y + 140))
+            ekraan.blit(output_surface,(koopa_asukoht.x + 55, koopa_asukoht.y + 180))
             punktiskaala(koopa_punktid)
     else:
         punktiskaala(koopa_punktid)
