@@ -1,9 +1,11 @@
 # ==== PILDID JA ALLIKAD ====
 # algus: https://labs.openai.com/e/1eKTRFCMXiySzw8GyvX3L43B/eDSvG8JU9axcTye8dpdbcXs2
 # taust: https://www.wallpaperflare.com/green-pine-trees-illustration-pixel-art-minimalism-sky-green-color-wallpaper-mllhy
+# lõpuekraani taust: https://www.pinterest.com/pin/606437906058118540/
 # koobas: https://www.pinterest.com/pin/102316222764332234/
 # koobas: https://labs.openai.com/e/LEE3GR0UIG5HgF4uZ6J5hvA0/3CSgvtud7Xs8qMeMidW8cYNV 
 # koobas õige: https://labs.openai.com/e/LEE3GR0UIG5HgF4uZ6J5hvA0/gfoz9yWJBi7W5ZCQCM3XLK6f
+# mari.png ja nefi.png: Marlene Ibrus
 
 
 # ==== IMPORTIMINE ====
@@ -26,47 +28,38 @@ taust = pygame.image.load("taust2.jpg")
 taust = pygame.transform.scale(taust, (1000, 800))
 taustavärv = (50,90,10)
 valge = (255,255,255)
+skoor = 0
 
 
-# ==== TEGELANE ====
+# ==== TEGELANE JA MARJAD ====
 # Meie karu nimi on Nefi
-nefi_pilt = pygame.image.load("Nefi_seisab.png").convert_alpha()
-nefi_pilt = pygame.transform.scale(nefi_pilt, (80, 100))
-#rect1 = nefi_pilt.get_rect()
-nefi_asukoht = pygame.Rect(100, 430, 80, 100)
 
-x = 0
-y = 0
-x_muutus = 0
-y_muutus = 0
+class Mari(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.pilt = pygame.image.load('mari.png').convert_alpha()
+        self.pilt = pygame.transform.scale(self.pilt, (35, 35))
+        self.rect = pygame.Rect(random.randint(40, 600), random.randint(200, 960), 35, 35)
+    
+    def kaob(self):
+        self.kill()
 
+class Nefi(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.pilt = pygame.image.load("Nefi_seisab.png").convert_alpha()
+        self.pilt = pygame.transform.scale(self.pilt, (80, 100))
+        self.rect = pygame.Rect(500, 500, 80, 100)
 
-# ==== MARJA GENEREERIMINE JA ÜLES KORJAMINE ====
+        self.x_muutus = 0
+        self.y_muutus = 0
+    
+    def kokkupõrge(self, mari, marja_grupp):
+        if self.rect.colliderect(self, mari):
+            mari.kaob()
+            skoor += 10
 
-mari_pilt = pygame.image.load('mari.png').convert_alpha()
-mari_pilt = pygame.transform.scale(mari_pilt, (35, 35))
-rect2 = mari_pilt.get_rect()
-mari_asukoht = pygame.Rect(0, 0, 35, 35)
-
-def mari_xy():
-    mari_x = 0 # SEAME MARJA X KOORDINAADI NULLI
-    mari_y = 0 # SEAME MARJA Y KOORDINAADI NULLI
-    mari_x = random.randint(20, 980)
-    mari_y = random.randint(20, 780)
-    return mari_x, mari_y
-
-def mari_ilmub(x):
-    mari_x, mari_y = mari_xy()
-    mari_x = int(mari_x)
-    mari_y = int(mari_y)
-    ekraan.blit(mari_pilt, (mari_x, mari_y))
-
-""" def mari_ilmub():
-    mari_pilt = pygame.image.load('mari.png').convert_alpha()
-    mari_pilt = pygame.transform.scale(mari_pilt, (35, 35))
-    mari_asukoht = (0, 0, randint(10, 990), randint(10, 700))
-    ekraan.blit(mari_pilt, mari_asukoht)
-    pygame.display.flip() """
+        
 
 
 # ==== TAIMER ====
@@ -76,26 +69,10 @@ def taimer_ekraanile(ekraan, x, y, aeg):
     sekundid = aeg - minutid * 60 
     font = pygame.font.Font("PressStart2P-Regular.ttf", 15)
     if minutid > 0:
-        tekst = font.render("Aega alles: "+ str(minutid) + "min ja " +str(sekundid)+ "s", 1, valge)
+        tekst = font.render("Aega alles: "+ str(minutid) + " min ja " +str(sekundid)+ " s", 1, valge)
     else:
-        tekst = font.render("Aega alles: " +str(sekundid)+ "s", 1, valge)
+        tekst = font.render("Aega alles: " +str(sekundid)+ " s", 1, valge)
     ekraan.blit(tekst, (x, y))
-
-
-
-# ==== LÕPUEKRAAN ====
-def sõnum_ekraanile(tekst, font):
-    tekstsurface = font.render(tekst, True, (255,255,255))
-    return tekstsurface, tekstsurface.get_rect()
-
-def sõnum(sõnum):
-    tekst_vorm = pygame.font.Font(None, 100)
-    TekstsSurf, TekstRect = sõnum_ekraanile(sõnum, tekst_vorm)
-    TekstRect.center = ((kõrgus / 2), (laius / 2))
-
-    ekraan.blit(TekstsSurf, TekstRect)
-    pygame.display.update()
-    time.sleep(10)
     
 
 # ==== KOOPA EHITAMISE JAOKS MÕELDUD ARVUTAMISMÄNG ====
@@ -236,7 +213,7 @@ def punktisumma(punktid):
     punktid_ekr = punkti_font.render('Punktid: '+str(punktid), True, (255,255,255))
     ekraan.blit(punktid_ekr, (50, 750))
 
-skoor = 0
+
 # ==== KUIDAS MÄNGIDA ====
 def õpetuseleht():
     õpetus = True
@@ -296,14 +273,57 @@ def algusleht(õpetuseleht):
         pygame.display.flip()
 
         ekraan.fill(taustavärv)
-    
+
+
+# ==== LÕPP ====
+def lõpuekraan(skoor):
+    taust = pygame.image.load("lõpp.png")
+    taust = pygame.transform.scale(taust,(1000, 1000))
+    lõpp = True
+    mängima_asukoht = pygame.Rect(390,700,220,80)
+
+    tekst = "Kätte jõudis november ning Nefi ja teised eesti pruunkarud läksid talveunne. Kuna talveuni kestab tavaliselt 4-5 kuud, siis on karudel vaja suured rasvavarud koguda. Sügesel on heaks energiaallikaks erinevad marjad!"
+    font = pygame.font.Font("PressStart2P-Regular.ttf", 20)
+    teksti_kast = font.render(tekst, 1, valge)
+
+
+    while lõpp:
+        ekraan.blit(taust,(0,0))
+        mängima_nupp = pygame.image.load("mängima_nupp.png").convert_alpha()
+        mängima_nupp = pygame.transform.scale(mängima_nupp, (220, 80))
+        ekraan.blit(mängima_nupp,mängima_asukoht)
+        ekraan.blit(teksti_kast,(0,200))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.display.quit()
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if mängima_asukoht.collidepoint(event.pos):
+                    algus = False
+                    return True
+
+        pygame.display.flip()
+        ekraan.fill(taustavärv)
+
+
+
+# ==== PAUS ====
+
+# ==== LOOME KARU JA MARJAD ====
+nefi = Nefi()
+mari = Mari()
+marjad = pygame.sprite.Group()
+marjad.add(mari)
+
+MARI_ILMUB = pygame.USEREVENT + 1
+pygame.time.set_timer(MARI_ILMUB, 15000)
 
 # ==== MÄNG ====
 programm_käib = algusleht(õpetuseleht)
-aja_muutuja = 10
 stardiaeg = pygame.time.get_ticks()
 
-mängu_aeg = 240 # kaua mäng kestab sekundites
+mängu_aeg = 10 # kaua mäng kestab sekundites
 
 
 while programm_käib:
@@ -316,28 +336,26 @@ while programm_käib:
     aega_alles = int(aega_alles)
     taimer_ekraanile(ekraan, 50, 50, aega_alles)
 
-    if aega_alles % 15 == 0:
-        mari_ilmub
-    
-    mari_ilmub(x)
 
     if (stardiaeg + (mängu_aeg * 1000)) <= pygame.time.get_ticks():
-        programm_käib = False
+        programm_käib = lõpuekraan(skoor)
+        pygame.display.flip()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.display.quit()
             pygame.quit()
             stardiaeg = pygame.time.get_ticks()
-
+        
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                x_muutus = -2
+                nefi.x_muutus = -2
             elif event.key == pygame.K_RIGHT:
-                x_muutus = 2
+                nefi.x_muutus = 2
             elif event.key == pygame.K_UP:
-                y_muutus = -2
+                nefi.y_muutus = -2
             elif event.key == pygame.K_DOWN:
-                y_muutus = 2
+                nefi.y_muutus = 2
             
             if event.key == pygame.K_BACKSPACE:
                 user_tekst = user_tekst[:-1]
@@ -351,15 +369,19 @@ while programm_käib:
     
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                x_muutus = 0
-                y_muutus = 0
-
+                nefi.x_muutus = 0
+                nefi.y_muutus = 0
+        
+        if event.type == MARI_ILMUB:
+            mari = Mari()
+            marjad.add(mari)
+        
     # ==== KOOPAMÄNG ==== 
     # tekitab koopa kasti, prindib tehte ja teeb koha, kuhu saab kirjutada. töötab ainult siis kui karu on kasti juures!
     pygame.draw.rect(ekraan,koopa_värv,koopa_asukoht,2)
     ekraan.blit(koopa_pilt,(koopa_asukoht.x - 10, koopa_asukoht.y-60))
     
-    if  nefi_asukoht.colliderect(koopa_asukoht) and indeks <= 18:
+    if  nefi.rect.colliderect(koopa_asukoht) and indeks <= 18:
         if koopa_punktid < 200: # koopa eest saab maksimaalselt 200 punkti  
             if i == 0:
                 uus_tehe = False
@@ -439,12 +461,16 @@ while programm_käib:
 
 
     punktisumma(skoor)
-    ekraan.blit(nefi_pilt, nefi_asukoht)
-    ekraan.blit(mari_pilt, mari_asukoht)
-    nefi_asukoht.move_ip(x_muutus, y_muutus)
-    nefi_asukoht.clamp_ip(ekraan.get_rect())
+    ekraan.blit(nefi.pilt, nefi.rect)
+    nefi.rect.move_ip(nefi.x_muutus, nefi.y_muutus)
+    nefi.rect.clamp_ip(ekraan.get_rect())
+
+    for mari in marjad:
+        ekraan.blit(mari.pilt, mari.rect)
+    
+    korjatud_marjad = pygame.sprite.spritecollide(nefi, marjad, True)
+    skoor += 10*len(korjatud_marjad)
         
     pygame.display.flip()
 
     ekraan.fill(taustavärv)
-
