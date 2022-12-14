@@ -83,7 +83,7 @@ base_font2 = pygame.font.Font("PressStart2P-Regular.ttf", 25)
 user_tekst = ""
 koopa_asukoht = pygame.Rect(670,550,220,200)
 koopa_värv = pygame.Color(124,212,52)
-koopa_pilt = pygame.image.load("koobas2.png").convert_alpha()
+koopa_pilt = pygame.image.load("koobas3.png").convert_alpha()
 koopa_pilt = pygame.transform.scale(koopa_pilt, (300, 300))
 mängija_vastus = "10000"
 indeks = 0 #on välimise jrj indeksiks 
@@ -163,7 +163,7 @@ def kakskümmmend_suvalist_avaldist_kerge():
         j += 1
         lst.append(jrj)
         jrj = []
-    while j < 20:
+    while j < 50:
         jrj += suvaline_avaldis_raske()
         j += 1
         lst.append(jrj)
@@ -220,9 +220,9 @@ def õpetuseleht():
     tagasi = pygame.Rect(390,700,220,80)
     taustavärv = (22,16,7)
 
-    taust = pygame.image.load("juhend_tekst.png")
+    taust = pygame.image.load("juhend_kirjeldus.png")
     while õpetus:
-        juhend = pygame.image.load("juhend_tekst.png").convert_alpha()
+        juhend = pygame.image.load("juhend_kirjeldus.png").convert_alpha()
         juhend = pygame.transform.scale(juhend, (1000, 800))
         ekraan.blit(juhend,(0,0))
 
