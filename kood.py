@@ -5,6 +5,7 @@
 # koobas: https://www.pinterest.com/pin/102316222764332234/
 # koobas: https://labs.openai.com/e/LEE3GR0UIG5HgF4uZ6J5hvA0/3CSgvtud7Xs8qMeMidW8cYNV 
 # koobas õige: https://labs.openai.com/e/LEE3GR0UIG5HgF4uZ6J5hvA0/gfoz9yWJBi7W5ZCQCM3XLK6f
+# pausi nupp: http://pixelartmaker.com/art/e42f566fc3d6e76
 # mari.png ja nefi.png: Marlene Ibrus
 
 
@@ -39,7 +40,7 @@ class Mari(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.pilt = pygame.image.load('mari.png').convert_alpha()
         self.pilt = pygame.transform.scale(self.pilt, (35, 35))
-        self.rect = pygame.Rect(random.randint(40, 600), random.randint(200, 960), 35, 35)
+        self.rect = pygame.Rect(random.randint(40, 600), random.randint(200, 600), 35, 35)
     
     def kaob(self):
         self.kill()
@@ -63,7 +64,22 @@ class Nefi(pygame.sprite.Sprite):
 
 
 # ==== TAIMER ====
-taimer = datetime.datetime.utcnow() + datetime.timedelta(seconds=240)
+mängu_aeg = 10 # kaua mäng kestab sekundites
+
+class Taimer:
+    def __init__(self):
+        self.algus = None
+        self.pausi_aeg = None
+        self.pausil = None
+        self.pilt = pygame.image.load("nupp.png").convert_alpha()
+        self.pilt = pygame.transform.scale(self.pilt, (30,30))
+        self.rect = pygame.Rect(955, 15, 30, 30)
+
+    def alusta(self):
+        self.algus = pygame.time.get_ticks()
+    
+
+
 def taimer_ekraanile(ekraan, x, y, aeg):
     minutid = aeg // 60
     sekundid = aeg - minutid * 60 
@@ -73,6 +89,18 @@ def taimer_ekraanile(ekraan, x, y, aeg):
     else:
         tekst = font.render("Aega alles: " +str(sekundid)+ " s", 1, valge)
     ekraan.blit(tekst, (x, y))
+
+
+
+# ==== LOOME KARU JA MARJAD ====
+nefi = Nefi()
+mari = Mari()
+marjad = pygame.sprite.Group()
+marjad.add(mari)
+taimer = Taimer()
+
+MARI_ILMUB = pygame.USEREVENT + 1
+pygame.time.set_timer(MARI_ILMUB, 15000)
     
 
 # ==== KOOPA EHITAMISE JAOKS MÕELDUD ARVUTAMISMÄNG ====
@@ -277,31 +305,46 @@ def algusleht(õpetuseleht):
 
 # ==== LÕPP ====
 def lõpuekraan(skoor):
-    taust = pygame.image.load("lõpp.png")
+    taust = pygame.image.load("lõpu_tekst.png")
     taust = pygame.transform.scale(taust,(1000, 1000))
     lõpp = True
-    mängima_asukoht = pygame.Rect(390,700,220,80)
-
-    tekst = "Kätte jõudis november ning Nefi ja teised eesti pruunkarud läksid talveunne. Kuna talveuni kestab tavaliselt 4-5 kuud, siis on karudel vaja suured rasvavarud koguda. Sügesel on heaks energiaallikaks erinevad marjad!"
-    font = pygame.font.Font("PressStart2P-Regular.ttf", 20)
-    teksti_kast = font.render(tekst, 1, valge)
-
+    
+    if skoor <= 0:
+        hinnang = "Sa kaotasid. Mis toimub..."
+        hinnang2 = "Nefi ei elaud kahjuks talve üle :("
+    elif skoor <= 100 and skoor > 0:
+        hinnang = "Nefi ärkas mitu kuud varem väga näljasena."
+        hinnang2 = "Sinu tõttu sõi ta mitu väikest last ära:("
+    elif skoor <= 200 and skoor > 100:
+        hinnang = "Skoor oli madal, Nefi oli kurb."
+        hinnang2 = "Proovi järgmine kord paremini!"
+    elif skoor <= 330 and skoor > 200:
+        hinnang = "Super! Nefi elas talve ilusti üle."
+        hinnang2 = "Hea töö! :)"
+    elif skoor > 330:
+        hinnang = "IMELINE TULEMUS! Nefi sai palju süüa"
+        hinnang2 = "ja poegis kevadel!"
+    
+    font = pygame.font.Font("PressStart2P-Regular.ttf", 35)
+    väiksem_font = pygame.font.Font("PressStart2P-Regular.ttf", 23)
+    tekst = font.render(f"Sinu tulemus on {skoor} punkti!", 1, valge)
+    tulemus = väiksem_font.render(hinnang, 1, valge)
+    tulemus2 = väiksem_font.render(hinnang2, 1, valge)
+    tulemus_rect = (50, 540)
+    tulemus_rect2 = (50, 590)
+    tekst_rect = (58,490)
 
     while lõpp:
         ekraan.blit(taust,(0,0))
-        mängima_nupp = pygame.image.load("mängima_nupp.png").convert_alpha()
-        mängima_nupp = pygame.transform.scale(mängima_nupp, (220, 80))
-        ekraan.blit(mängima_nupp,mängima_asukoht)
-        ekraan.blit(teksti_kast,(0,200))
+        ekraan.blit(tekst, tekst_rect)
+        ekraan.blit(tulemus, tulemus_rect)
+        ekraan.blit(tulemus2, tulemus_rect2)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.display.quit()
                 pygame.quit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if mängima_asukoht.collidepoint(event.pos):
-                    algus = False
-                    return True
 
         pygame.display.flip()
         ekraan.fill(taustavärv)
@@ -309,22 +352,52 @@ def lõpuekraan(skoor):
 
 
 # ==== PAUS ====
+paus = False
+jätka = 0
+pausi_algus = 0
+taimer.alusta()
+stardiaeg = taimer.algus
 
-# ==== LOOME KARU JA MARJAD ====
-nefi = Nefi()
-mari = Mari()
-marjad = pygame.sprite.Group()
-marjad.add(mari)
 
-MARI_ILMUB = pygame.USEREVENT + 1
-pygame.time.set_timer(MARI_ILMUB, 15000)
+def pausiekraan():
+    global paus, jätka, stardiaeg, mängu_aeg
+    pausi_algus = pygame.time.get_ticks()
+    taust = pygame.image.load("taust2.jpg")
+    taust = pygame.transform.scale(taust,(1000, 800))
+    paus = True
+    mängima_asukoht = pygame.Rect(390,700,220,80)
+    font = pygame.font.Font("PressStart2P-Regular.ttf", 40)
+    tekst = font.render("Mäng pausil!", 1, valge)
+    tekst_rect = (270,400)
+
+    while paus:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.display.quit()
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if mängima_asukoht.collidepoint(event.pos):
+                    paus = False
+                    jätka = pygame.time.get_ticks()
+                    pausi_pikkus = jätka - pausi_algus
+                    stardiaeg = stardiaeg + pausi_pikkus/1000
+                    mängu_aeg = mängu_aeg + pausi_pikkus/1000
+                    return True
+        
+        ekraan.blit(taust,(0,0))
+        ekraan.blit(tekst, tekst_rect)
+        mängima_nupp = pygame.image.load("mängima_nupp.png").convert_alpha()
+        mängima_nupp = pygame.transform.scale(mängima_nupp, (220, 80))
+        ekraan.blit(mängima_nupp,mängima_asukoht)
+        
+        pygame.display.flip()
+
+        ekraan.fill(taustavärv)
+
+
 
 # ==== MÄNG ====
 programm_käib = algusleht(õpetuseleht)
-stardiaeg = pygame.time.get_ticks()
-
-mängu_aeg = 10 # kaua mäng kestab sekundites
-
 
 while programm_käib:
 
@@ -335,11 +408,11 @@ while programm_käib:
     aega_alles = mängu_aeg - aega_alles
     aega_alles = int(aega_alles)
     taimer_ekraanile(ekraan, 50, 50, aega_alles)
+    
 
 
     if (stardiaeg + (mängu_aeg * 1000)) <= pygame.time.get_ticks():
         programm_käib = lõpuekraan(skoor)
-        pygame.display.flip()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -366,7 +439,12 @@ while programm_käib:
                 user_tekst = ""
                 uus_tehe = True
                 arv = 1
-    
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if taimer.rect.collidepoint(event.pos):
+                paus = True
+                programm_käib = pausiekraan()
+
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                 nefi.x_muutus = 0
@@ -461,6 +539,7 @@ while programm_käib:
 
 
     punktisumma(skoor)
+    ekraan.blit(taimer.pilt, taimer.rect)
     ekraan.blit(nefi.pilt, nefi.rect)
     nefi.rect.move_ip(nefi.x_muutus, nefi.y_muutus)
     nefi.rect.clamp_ip(ekraan.get_rect())
